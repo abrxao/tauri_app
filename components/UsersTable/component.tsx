@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { createUserData } from "../CreateUserForm";
+import { createUserData } from "../UserCreateForm";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../ui/button";
 import { Cross2Icon } from "@radix-ui/react-icons";
@@ -16,7 +16,6 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -26,12 +25,11 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import deleteUser from "@/libAPI/delete-user";
+import { deleteUser } from "@/lib/APIFunctions/user-api";
 import { Skeleton } from "../ui/skeleton";
 export interface UserStruct extends createUserData {
   _id: { $oid: string };
@@ -50,7 +48,6 @@ export default function UsersTable_() {
     mutationFn: deleteUser,
     onSuccess(response) {
       const id = response.data._id.$oid;
-      const usersCached = queryClient.getQueryData(["users"]);
       queryClient.setQueryData(["users"], (data: UserStruct[]) => {
         return data.filter((elem) => id !== elem._id.$oid);
       });
@@ -58,22 +55,23 @@ export default function UsersTable_() {
   });
   const [open, setOpen] = useState<boolean>(false);
   const [toDelete, setToDelete] = useState<UserStruct | undefined>();
+  const isDesktop = window.innerWidth > 768;
 
   return (
     <>
-      {true ? (
+      {isDesktop ? (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Deseja remover esse documento?</DialogTitle>
-              <DialogDescription>
+              <div>
                 <p>Nome: {toDelete?.name}</p>
                 <p> Location: {toDelete?.location}</p>
                 <p> Titulo: {toDelete?.title}</p>
                 <p className="mt-2 font-bold text-red-700">
                   Esta ação não pode ser desfeita.
                 </p>
-              </DialogDescription>
+              </div>
             </DialogHeader>
             <DialogFooter className="pt-2 flex items-end">
               <DialogClose asChild>
@@ -96,14 +94,14 @@ export default function UsersTable_() {
             <DrawerHeader className="text-left">
               <DrawerTitle>Deseja remover esse documento?</DrawerTitle>
 
-              <DrawerDescription className="text-zinc-950">
+              <div className="text-zinc-950">
                 <p>Nome: {toDelete?.name}</p>
                 <p> Location: {toDelete?.location}</p>
                 <p> Titulo: {toDelete?.title}</p>
                 <p className="mt-2 font-bold text-red-700">
                   Esta ação não pode ser desfeita.
                 </p>
-              </DrawerDescription>
+              </div>
             </DrawerHeader>
             <DrawerFooter className="pt-2 flex items-end">
               <DrawerClose asChild>
@@ -121,7 +119,7 @@ export default function UsersTable_() {
           </DrawerContent>
         </Drawer>
       )}
-      <div className="border rounded-xl p-0.5 hover:shadow-md duration-200">
+      <div className="border rounded-xl p-0.5 hover:shadow-md duration-150">
         <Table>
           <TableHeader>
             <TableRow>
@@ -149,7 +147,7 @@ export default function UsersTable_() {
                         setOpen(true);
                       }}
                     >
-                      delete <Cross2Icon height={20} width={20} />
+                      delete <Cross2Icon height={16} width={16} />
                     </Button>
                   </TableCell>
                 </TableRow>
