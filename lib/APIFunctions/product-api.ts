@@ -1,9 +1,9 @@
-import { ProductStruct, createProductResponse } from "./types-product-api";
+import { ProductStruct, createDocumentResponse } from "./types-product-api";
 import { createProductData } from "@/components/ProductCreateForm/product-form-schema";
 import axios from "axios";
 
 export async function createProduct(productData: createProductData) {
-  const response = await axios<createProductResponse>(
+  const response = await axios<createDocumentResponse>(
     "http://127.0.0.1:8000/product",
     {
       method: "post",

@@ -15,10 +15,10 @@ import { Button } from "../ui/button";
 import { sendNotification } from "@tauri-apps/api/notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createProduct, updateProduct } from "@/lib/APIFunctions/product-api";
-import { UserStruct } from "../UsersTable/component";
 import { Textarea } from "../ui/textarea";
 import { ProductSchema, createProductData } from "./product-form-schema";
 import useProductPageState from "@/app/products/products.store";
+import { ProductStruct } from "@/lib/APIFunctions/types-product-api";
 
 export default function ProductCreateForm() {
   const { toEditProduct, setIsProductFormOpen, setToEditProduct } =
@@ -44,6 +44,7 @@ export default function ProductCreateForm() {
   });
   //////////////////////////////////////////
   const queryClient = useQueryClient();
+  //Those is the mutation functions that will be called when the form is submitted and update local data state
   const { mutateAsync: createProductFn } = useMutation({
     mutationFn: createProduct,
     onSuccess(response, variables) {
@@ -58,13 +59,12 @@ export default function ProductCreateForm() {
         },
         ...variables,
       };
-      queryClient.setQueryData(["products"], (data: UserStruct[]) => [
+      queryClient.setQueryData(["products"], (data: ProductStruct[]) => [
         ...data,
         newUser,
       ]);
       sendNotification({
         title: `Produto ${variables.name} foi criado!`,
-        icon: "favicon.ico",
       });
 
       setIsProductFormOpen(false);
@@ -75,22 +75,22 @@ export default function ProductCreateForm() {
   const { mutateAsync: updateProductFn } = useMutation({
     mutationFn: updateProduct,
     onSuccess(response, variables) {
-      queryClient.setQueryData(["products"], (data: UserStruct[]) =>
+      queryClient.setQueryData(["products"], (data: ProductStruct[]) =>
         data.map((elem) => {
-          if (elem._id.$oid == response.data._id?.$oid) {
+          if (elem._id?.$oid == response.data._id?.$oid) {
             return response.data;
           } else {
             return elem;
           }
         })
       );
-      sendNotification(`Produto ${variables.name} foi editado!`);
+      sendNotification({ title: `Produto ${variables.name} foi editado!` });
       setIsProductFormOpen(false);
       setToEditProduct(null);
       form.reset();
     },
   });
-
+  //////////////////////////////////////////
   async function createProductRequest(productData: createProductData) {
     try {
       if (toEditProduct != null) {

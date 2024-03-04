@@ -3,12 +3,15 @@ interface ApiResponse<T> {
   message: string;
   data: T;
 }
-export type createProductResponse = {
+export type createDocumentResponse = {
   insertedId: {
     $oid: string;
   };
 };
-type DateTimeMongo = {
+export type ObjectID = {
+  $oid: string;
+};
+export type DateTimeMongo = {
   $date: {
     $numberLong: string;
   };
@@ -34,8 +37,3 @@ interface Product {
   name: string;
   price: number;
 }
-
-type GetProductResponse = ApiResponse<Product>;
-type CreateProductResponse = ApiResponse<number>;
-type UpdateProductResponse = ApiResponse<boolean>;
-type DeleteProductResponse = ApiResponse<boolean>;
