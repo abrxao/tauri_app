@@ -2,10 +2,10 @@
 
 import { cookies } from "next/headers";
 
-export async function setToken(Token: string) {
+export async function setToken(Token: string, time: number /* minutes */) {
   cookies().set("token", Token, {
     httpOnly: true,
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 2),
+    expires: new Date(Date.now() + time * 60000),
   });
 }
 

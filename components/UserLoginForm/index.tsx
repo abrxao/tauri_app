@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { signIn } from "@/lib/APIFunctions/user-api";
 import { setToken } from "@/app/actions";
+import { toast } from "sonner";
 
 const loginUserSchema = z.object({
   username: z.string().min(1, "Nome de usuario é obrigatório"),
@@ -37,15 +38,19 @@ export default function UserLoginForm() {
     try {
       const response = await signIn(userData);
       if (response?.status === 200) {
-        await setToken("to_implement");
+        await setToken("to_implement", 10);
         router.push("/products");
       }
     } catch (error: unknown) {
+      console.log(error);
       if (typeof error === "string") {
         sendNotification(error);
       } else if (error instanceof Error) {
         sendNotification(error.message);
       }
+    } finally {
+      setIsLoading(false);
+      toast("Erro ao fazer login");
     }
   }
   return (
